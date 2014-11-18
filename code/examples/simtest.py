@@ -151,14 +151,18 @@ for order in [0,2]:
         res[i] = val
         logging.info("results, order %d: %s", order, res[i])
 
-    # graph
+    logx = -np.log(hs[:-1])
+    logy = np.log(np.abs(baseline-res[:-1]))
+    convrate = -np.diff(logy)/(np.diff(logx)+1e-8)
+    logging.info("convergence rates, order %d: %s", order, convrate)
+    logging.info("mean convergence rates, order %d: %s", order, np.mean(convrate[np.isfinite(convrate)]))
+
+    # plot
     plt.figure(20)
     plt.plot(hk,res,colors[order],label='order '+str(order))
     plt.figure(21)
-    logx = -np.log(hs[:-1])
-    logy = np.log(np.abs(baseline-res[:-1]))
     ax1.plot(logx,logy,colors[order],label='order '+str(order))
-    ax2.plot(logx[1:],-np.diff(logy)/(np.diff(logx)+1e-6),colors[order]+'--',label='order '+str(order))
+    ax2.plot(logx[1:],convrate,colors[order]+'--',label='order '+str(order))
     ax2.set_ylim(-7,7)
     plt.xlim(-np.log(hs[1]),-np.log(hs[-1]))
 
