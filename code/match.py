@@ -34,10 +34,7 @@ import matplotlib.pyplot as plt
 import itertools
 import logging
 
-N_t = 100
-t_span = np.linspace(0. ,2. , N_t )
-
-def F(sim, nonmoving, x, weights=None, adjint=True, order=2, scalegrad=None, simGradCheck=False, visualize=False):
+def F(sim, nonmoving, x, weights=None, adjint=True, order=2, scalegrad=None, simGradCheck=False, energyGradCheck=False, visualize=False):
     """
     Function that scipy's optimize function will call for returning the value 
     and gradient for a given x. The forward and adjoint integration is called 
@@ -140,6 +137,16 @@ def F(sim, nonmoving, x, weights=None, adjint=True, order=2, scalegrad=None, sim
         logging.debug("finite diff gradient: " + str(findiffgrad))
         logging.debug("computed gradient: " + str(compgrad))
         logging.debug("difference: " + str(findiffgrad-compgrad))
+    if energyGradCheck:
+        logging.info("computing finite difference approximation of energy gradient")
+        fsim = lambda x: tj.Hamiltonian(q0,np.reshape(x[0:N*DIM],[N,DIM]),np.reshape(x[N*DIM:N*DIM+N*DIM**2],[N,DIM,DIM]),np.reshape(x[N*DIM+N*DIM**2:N*DIM+N*DIM**2+N*DIM**3],[N,DIM,DIM,DIM]))
+        findiffgrad = approx_fprime(np.hstack((p0.flatten(),mu0_1.flatten(),mu0_2.flatten(),)),fsim,1e-7)
+        compgrad = tj.grad_Hamiltonian(q0,p0,mu0_1,mu0_2)
+        graderr = np.max(abs(findiffgrad-compgrad))
+        logging.debug("energy gradient numerical check error: %e",graderr)
+        logging.debug("finite diff gradient: " + str(findiffgrad))
+        logging.debug("computed gradient: " + str(compgrad))
+        logging.debug("difference: " + str(findiffgrad-compgrad))
     
     (t_span, y_span) = tj.adj_integrate(stateT,ds1)
     adjstate0 = y_span[-1]
@@ -148,7 +155,7 @@ def F(sim, nonmoving, x, weights=None, adjint=True, order=2, scalegrad=None, sim
     gradE = tj.grad_Hamiltonian(q0,p0,mu0_1,mu0_2)
     assert(adjstate0.size/2-nonmoving.size == gradE.size) # gradE doesn't include point variations currently
     gradE = gradE[0:x.size]
-    grad0 = weights[1]*np.array(adjstate0[adjstate0.size/2+nonmoving.size:adjstate0.size/2+nonmoving.size+x.size] + weights[0]*gradE) # transported gradient + grad of energy
+    grad0 = weights[1]*adjstate0[adjstate0.size/2+nonmoving.size:adjstate0.size/2+nonmoving.size+x.size] + weights[0]*gradE # transported gradient + grad of energy
 
     adjstate0[adjstate0.size/2+nonmoving.size:adjstate0.size/2+nonmoving.size+grad0.size] = grad0
     grad0 = tj.state_to_triangular(adjstate0[adjstate0.size/2:adjstate0.size])[triunonmoving.size:triunonmoving.size+triux.size]
@@ -356,9 +363,11 @@ def match(sim,SIGMA,weights,initial=None,gradTol=None,order=2,scalegrad=True, ma
         x0moving = res.x
 
         # grad check for similarity
-        F(sim, x0nonmoving, x0moving, weights=weights, adjint=True, order=order, scalegrad=scalegrad,simGradCheck=True)
+        F(sim, x0nonmoving, x0moving, weights=weights, adjint=True, order=order, scalegrad=scalegrad,simGradCheck=True,energyGradCheck=True)
 
         # grad check full system
+        #f = lambda x: F(sim, x0nonmoving, x, weights=[0,1], adjint=False, order=order, scalegrad=False, visualize=visualizeIterations)
+        #fgrad = lambda x: F(sim, x0nonmoving, x, weights=[0,1], order=order, scalegrad=False, visualize=visualizeIterations)[1]
         logging.info("computing finite difference approximation of gradient")
         findiffgrad = approx_fprime(x0moving,f,1e-7)
         compgrad = fgrad(x0moving)
