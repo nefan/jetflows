@@ -302,7 +302,7 @@ def Fdisp(sim, nonmoving, x, adjint=True, weights=None, order=2, scalegrad=None)
     
     return (weights[1]*simT[0]+weights[0]*Ediff, grad0)
 
-def match(sim,SIGMA,weights,initial=None,gradTol=None,order=2,scalegrad=True, maxIter=150, visualize=False, visualizeIterations=False):
+def match(sim,SIGMA,weights,initial=None,initialMomentum=None,gradTol=None,order=2,scalegrad=True, maxIter=150, visualize=False, visualizeIterations=False):
     """
     Perform matching using the supplied similarity measure, the two_jet flow 
     and scipy's optimizer. A gradient check can be performed for the initial 
@@ -323,9 +323,14 @@ def match(sim,SIGMA,weights,initial=None,gradTol=None,order=2,scalegrad=True, ma
     logging.info("Flow parameters: weights %s, order %d, SIGMA %g, scalegrad %s, gradTol %s, maxIter %d, visualize %s, visualizeIterations %s",weights,order,SIGMA,scalegrad,gradTol,maxIter,visualize,visualizeIterations)
 
     # initial guess (x0moving)
-    p = np.zeros([N,DIM])
-    mu_1 = np.zeros([N,DIM,DIM])
-    mu_2 = np.zeros([N,DIM,DIM,DIM])
+    if not initialMomentum:
+        p = np.zeros([N,DIM])
+        mu_1 = np.zeros([N,DIM,DIM])
+        mu_2 = np.zeros([N,DIM,DIM,DIM])
+    else:
+        p = initialMomentum[0]
+        mu_1 = initialMomentum[1]
+        mu_2 = initialMomentum[2]
     if not initial:
         (q,q_1,q_2) = (np.zeros([N,DIM]), np.outer(np.ones(N),np.eye(DIM)).reshape([N,DIM,DIM]), np.zeros([N,DIM,DIM,DIM]))
     elif len(initial) == 1:

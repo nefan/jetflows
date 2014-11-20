@@ -273,23 +273,23 @@ def imsim( state, N=None, imshape=None, DIM=None, h=None, imms=None, Dimms=None,
                 mgridT = mgridts[-1:].reshape(-1,DIM)
                 pg.plotGrid(mgridT,Nx,Ny)
 
-            # generate vertices of a circle
-            N_vert = 20
-            circle_verts = np.zeros( [ 2 , N_vert + 1 ] )
-            theta = np.linspace(0,2*np.pi, N_vert )
-            circle_verts[0,0:N_vert] = SIGMA*np.cos(theta)
-            circle_verts[1,0:N_vert] = SIGMA*np.sin(theta)
-            verts = np.zeros([2, N_vert + 1])
-            units = np.ones( N_vert + 1)
+            ## generate vertices of a circle
+            #N_vert = 20
+            #circle_verts = np.zeros( [ 2 , N_vert + 1 ] )
+            #theta = np.linspace(0,2*np.pi, N_vert )
+            #circle_verts[0,0:N_vert] = SIGMA*np.cos(theta)
+            #circle_verts[1,0:N_vert] = SIGMA*np.sin(theta)
+            #verts = np.zeros([2, N_vert + 1])
+            #units = np.ones( N_vert + 1)
 
-            for i in range(0,len(q)):
-                plt.arrow(q[i,0], q[i,1], 0.2*p[i,0], 0.2*p[i,1],\
-                        head_width=0.2, head_length=0.2,\
-                        fc='b', ec='b')
-                if (q_1 != None):
-                    verts = np.dot(q_1[i,:,:], circle_verts ) \
-                            + np.outer(q[i,:],units)
-                    plt.plot(verts[0],verts[1],'r-')
+            #for i in range(0,len(q)):
+            #    plt.arrow(q[i,0], q[i,1], 0.2*p[i,0], 0.2*p[i,1],\
+            #            head_width=0.2, head_length=0.2,\
+            #            fc='b', ec='b')
+            #    if (q_1 != None):
+            #        verts = np.dot(q_1[i,:,:], circle_verts ) \
+            #                + np.outer(q[i,:],units)
+            #        plt.plot(verts[0],verts[1],'r-')
 
             border = 0.4
             plt.xlim(min(np.vstack((qf,q))[:,0])-border,max(np.vstack((qf,q))[:,0])+border)
@@ -435,7 +435,7 @@ def get(pointsPerAxis, immname, imfname, immT=None, visualize=False, border=0, n
     reggrid = None
     if visualize:
         plt.figure(1)
-        reggrid = pg.getGrid(border,-border+Nx,border,-border+Ny,xpts=40,ypts=40)
+        reggrid = pg.getGrid(border,border+Nx,border,border+Ny,xpts=40,ypts=40)
         pg.plotGrid(*reggrid)
 
         # attach grids

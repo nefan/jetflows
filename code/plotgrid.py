@@ -63,7 +63,7 @@ def getGrid(xmin,xmax,ymin,ymax,xres=None,yres=None,xpts=None,ypts=None):
     return (d2zip(grid),Nx,Ny)
     
 
-def plotGrid(grid,Nx,Ny,coloring=False):
+def plotGrid(grid,Nx,Ny,coloring=True):
     """
     Plot grid
     """
