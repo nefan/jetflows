@@ -65,9 +65,9 @@ logging.info("baseline sp: %g", baseline_sp)
 #moving_im = np.array([f(5.*2.*np.pi*x[i,j]/512.) for i in range(0,512) for j in range(0,512)]).reshape([512,512])
 #moving_im = np.sin(((x+y)/(2.*512.))**2)
 #moving_im = np.sin((x+y)/(2.*512.))
-#moving_im = ((x+y)/(2.*512.))**2 # linspace 0,5,18
+#moving_im = ((x+y)/(2.*512.))**2 # linspace 0,5,18, for paper
 #moving_im = (x/(512.))**2
-#moving_im = (x+y)/(2.*512.) # linspace 0,5,18
+#moving_im = (x+y)/(2.*512.) # linspace 0,5,18, for paper
 #moving_im = x/(512.)
 #moving_im = .7*np.ones(x.shape)
 np.save(moving,moving_im)
@@ -89,6 +89,7 @@ splineS = 1e2
 
 logging.info("image dimensions: %s", moving_im.shape)
 
+#hk = np.linspace(0,5,18) # for linear and quadratic plots
 hk = np.linspace(1,6,24) # np.array([2,3]) for image with points
 hs = np.zeros(hk.shape)
 ppas = np.zeros(hk.shape)
@@ -168,13 +169,14 @@ for order in [0,2]:
 
 # ref
 L2ref = 1./np.prod(moving_im.shape)*np.sum( moving_im**2 )
-#plt.plot(np.arange(len(res)),np.repeat(L2ref,res.shape),'k',label='pixelwise')
+#plt.plot(np.arange(len(res)),np.repeat(L2ref,res.shape),'j',label='pixelwise')
 logging.info("L2 ref (non-smoothed): %g", L2ref )
 
 # plots
 plt.figure(20)
 plt.title('Match Term Approximation')
-plt.xlabel('$k=0,\ldots,8$ ($h=\mathrm{ceil}(2^{-k})$)')
+plt.xlabel('$j=1,\ldots,6$ ($h=\mathrm{ceil}(2^{-j})$)')
+#plt.xlabel('$j=0,\ldots,5$ ($h=\mathrm{ceil}(2^{-j})$)')
 plt.ylabel('measured $L^2$ dissimilarity')
 #plt.ylim(0,2)
 plt.legend()
