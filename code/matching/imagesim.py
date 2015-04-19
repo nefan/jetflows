@@ -443,7 +443,8 @@ def get(pointsPerAxis, immname, imfname, immT=None, visualize=False, border=0, n
 
         # image grid for warping
         pointsPerAxis = complex(0,visRes)
-        imgrid = d2zip(np.mgrid[border:border+Nx:pointsPerAxis,border:border+Ny:pointsPerAxis])
+        imborder = 0 # -15
+        imgrid = d2zip(np.mgrid[border+imborder:border+Nx-imborder:pointsPerAxis,border+imborder:border+Ny-imborder:pointsPerAxis])
         f = partial(f, imgrid=imgrid, imf=imf, imm=imm, imfs=imfs)
 
         plt.figure(0)
